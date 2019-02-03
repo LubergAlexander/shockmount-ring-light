@@ -14,3 +14,6 @@ Fits perfectly under the shockmount.
 # Pictures
 
 ![PCB Render](/images/led-ring-mic.png?raw=true "3D PCB Render")
+![Produced PCB](/images/real-pcb.png?raw=true "Produced PCB")
+![First Test](/images/its-alive.png?raw=true "First Test")
+![Installed](/images/installed.png?raw=true "Installed")
