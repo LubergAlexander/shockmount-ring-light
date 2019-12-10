@@ -4,17 +4,45 @@ on: [push]
 
 jobs:
   build:
-    container:
-      image: alexluberg/kicad:nightly
-      volumes: 
-        - /github/workspace/hardware:/root/project  
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Build Gerbers
-      run: python3 pcbnew_automation/plot.py --file_format zip_gerbers /root/project/led-ring-mic.kicad_pcb /root/project/output
-    
+    - name: Render PCB PDF
+      run: docker run -v `pwd`/hardware:/root/project -v `pwd`/output:/root/output alexluberg/kicad:nightly python3 pcbnew_automation/plot.py --file_format pdf /root/project/led-ring-mic.kicad_pcb /root/output/pcb_pdf/    
+    - name: Build Gerbers zip archive
+      run: docker run -v `pwd`/hardware:/root/project -v `pwd`/output:/root/output alexluberg/kicad:nightly python3 pcbnew_automation/plot.py --file_format zip_gerbers /root/project/led-ring-mic.kicad_pcb /root/output/gerbers/
+    - name: Render Schematic PDF
+      run: docker run -v `pwd`/hardware:/root/project -v `pwd`/output:/root/output alexluberg/kicad:nightly python -m eeschema.schematic export -a --file_format pdf /root/project/led-ring-mic.sch /root/output/schematic_pdf
+     
+     
+    - name: Render schematics in SVG
+      run: docker run -v `pwd`/hardware:/root/project -v `pwd`/output:/root/output alexluberg/kicad:nightly python -m eeschema.schematic export -a --file_format svg /root/project/led-ring-mic.sch /root/output/schematic_svg
+    - name: Run Electrical Rules Check
+      run: docker run -v `pwd`/hardware:/root/project -v `pwd`/output:/root/output alexluberg/kicad:nightly python -m eeschema.schematic run_erc --junit_xml -w /root/project/led-ring-mic.sch /root/output/erc_report
+    - name: Run Design Rules Check
+      run: docker run -v `pwd`/hardware:/root/project -v `pwd`/output:/root/output alexluberg/kicad:nightly python2 -m pcbnew_automation.run_drc --record /root/project/led-ring-mic.kicad_pcb /root/output/drc_report
+
     - uses: actions/upload-artifact@v1
       with:
-          name: Gerbers
-          path: /github/workspace/hardware/output
+        name: Gerbers ZIP
+        path: ./output/gerbers/led-ring-mic_gerbers.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Schematic PDF
+        path: ./output/schematic_pdf/led-ring-mic.pdf
+    - uses: actions/upload-artifact@v1
+      with:
+        name: PDF PCB
+        path: ./output/pcb_pdf/led-ring-mic.pdf
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Schematics SVG
+        path: ./output/schematic_svg/led-ring-mic.svg
+    - uses: actions/upload-artifact@v1
+      with:
+        name: ERC
+        path: ./output/erc_report/junit.xml
+    - uses: actions/upload-artifact@v1
+      with:
+        name: DRC
+        path: ./output/drc_report/drc_result.rpt
