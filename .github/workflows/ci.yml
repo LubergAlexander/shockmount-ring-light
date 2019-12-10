@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
     container:
-      image: alexluberg:kicad:nightly
+      image: alexluberg/kicad:nightly
       volumes: 
         - /github/workspace/hardware:/root/project  
     runs-on: ubuntu-latest
