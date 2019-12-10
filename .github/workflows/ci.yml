@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build Gerbers
       run: |
-        docker run -v ./hardware:/root/project -v ./output:/root/output -it alexluberg/kicad:nightly python3 pcbnew_automation/plot.py --file_format pdf /root/project/led-ring-mic.kicad_pcb /root/output/pcb_pdf/    
+        docker run -v ./hardware:/root/project -v ./output:/root/output alexluberg/kicad:nightly python3 pcbnew_automation/plot.py --file_format pdf /root/project/led-ring-mic.kicad_pcb /root/output/pcb_pdf/    
     - uses: actions/upload-artifact@v1
       with:
           name: PDF PCB
