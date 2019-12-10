@@ -15,6 +15,8 @@ jobs:
       run: |
         ls -la
         which python3
+        pwd
+        cd hardware
         python3 pcbnew_automation/plot.py --file_format zip_gerbers /root/project/led-ring-mic.kicad_pcb /root/project/output
     
     - uses: actions/upload-artifact@v1
