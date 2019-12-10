@@ -4,22 +4,13 @@ on: [push]
 
 jobs:
   build:
-    container:
-      image: alexluberg/kicad:nightly
-      volumes: 
-        - /github/workspace/hardware:/root/project  
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: Build Gerbers
       run: |
-        ls -la
-        which python3
-        pwd
-        cd hardware
-        python3 pcbnew_automation/plot.py --file_format zip_gerbers /root/project/led-ring-mic.kicad_pcb /root/project/output
-    
+        docker run -v ./hardware:/root/project -v ./output:/root/output -it alexluberg/kicad:nightly python3 pcbnew_automation/plot.py --file_format pdf /root/project/led-ring-mic.kicad_pcb /root/output/pcb_pdf/    
     - uses: actions/upload-artifact@v1
       with:
-          name: Gerbers
-          path: /github/workspace/hardware/output
+          name: PDF PCB
+          path: ./output/pcb_pdf/led-ring-mic.pdf
